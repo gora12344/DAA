@@ -1,0 +1,72 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+using namespace std;
+
+// A Huffman Tree node
+struct Node {
+    char ch;
+    int freq;
+    Node *left, *right;
+
+    Node(char c, int f) {
+        ch = c;
+        freq = f;
+        left = right = nullptr;
+    }
+};
+
+// Compare function for priority queue (min-heap)
+struct Compare {
+    bool operator()(Node* a, Node* b) {
+        return a->freq > b->freq; // smaller frequency = higher priority
+    }
+};
+
+// Recursive function to print Huffman Codes
+void printCodes(Node* root, string code) {
+    if (!root)
+        return;
+
+    // If leaf node (character found)
+    if (!root->left && !root->right)
+        cout << root->ch << " : " << code << endl;
+
+    printCodes(root->left, code + "0");
+    printCodes(root->right, code + "1");
+}
+
+int main() {
+    int n;
+    cout << "Enter number of characters: ";
+    cin >> n;
+
+    char ch;
+    int freq;
+    priority_queue<Node*, vector<Node*>, Compare> pq;
+
+    cout << "Enter characters and their frequencies:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> ch >> freq;
+        pq.push(new Node(ch, freq));
+    }
+
+    // Build Huffman Tree
+    while (pq.size() > 1) {
+        Node* left = pq.top(); pq.pop();
+        Node* right = pq.top(); pq.pop();
+
+        Node* newNode = new Node('$', left->freq + right->freq);
+        newNode->left = left;
+        newNode->right = right;
+
+        pq.push(newNode);
+    }
+
+    Node* root = pq.top();
+
+    cout << "\nHuffman Codes are:\n";
+    printCodes(root, "");
+
+    return 0;
+}
