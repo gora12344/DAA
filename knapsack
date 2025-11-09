@@ -1,0 +1,28 @@
+def fractional_knapsack(values, weights, capacity):
+    items = sorted(zip(values, weights), key=lambda x: x[0]/x[1], reverse=True)
+    total_value = 0.0
+
+    for v, w in items:
+        if capacity >= w:
+            total_value += v
+            capacity -= w
+        else:
+            total_value += v * (capacity / w)
+            break
+    return total_value
+
+# ---- User Input ----
+n = int(input("Enter number of items: "))
+values = []
+weights = []
+
+for i in range(n):
+    v = float(input("enter the value of item "+str(i+1)+" : "))
+    w = float(input(f"Enter weight of item {i+1}: "))
+    values.append(v)
+    weights.append(w)
+
+capacity = float(input("Enter knapsack capacity: "))
+
+max_value = fractional_knapsack(values, weights, capacity)
+print("Maximum value in Knapsack =", round(max_value, 2))
