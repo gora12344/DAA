@@ -1,72 +1,51 @@
-#include <iostream>
-#include <queue>
-#include <vector>
-using namespace std;
+import heapq
 
-// A Huffman Tree node
-struct Node {
-    char ch;
-    int freq;
-    Node *left, *right;
+# Create a class for tree nodes
+class Node:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+    
+    # Less than method for heap
+    def __lt__(self, other):
+        return self.freq < other.freq
 
-    Node(char c, int f) {
-        ch = c;
-        freq = f;
-        left = right = nullptr;
-    }
-};
+# Function to print Huffman Codes
+def print_codes(node, code=""):
+    if node is None:
+        return
+    if node.char != "*":  # leaf node
+        print(f"{node.char}: {code}")
+    print_codes(node.left, code + "0")
+    print_codes(node.right, code + "1")
 
-// Compare function for priority queue (min-heap)
-struct Compare {
-    bool operator()(Node* a, Node* b) {
-        return a->freq > b->freq; // smaller frequency = higher priority
-    }
-};
+# Main program
+n = int(input("Enter number of characters: "))
+chars = []
+freqs = []
 
-// Recursive function to print Huffman Codes
-void printCodes(Node* root, string code) {
-    if (!root)
-        return;
+for i in range(n):
+    ch = input(f"Enter character {i+1}: ")
+    fr = int(input(f"Enter frequency of '{ch}': "))
+    chars.append(ch)
+    freqs.append(fr)
 
-    // If leaf node (character found)
-    if (!root->left && !root->right)
-        cout << root->ch << " : " << code << endl;
+# Create a heap (priority queue)
+heap = [Node(chars[i], freqs[i]) for i in range(n)]
+heapq.heapify(heap)
 
-    printCodes(root->left, code + "0");
-    printCodes(root->right, code + "1");
-}
+# Build Huffman Tree
+while len(heap) > 1:
+    left = heapq.heappop(heap)
+    right = heapq.heappop(heap)
+    new_node = Node("*", left.freq + right.freq)
+    new_node.left = left
+    new_node.right = right
+    heapq.heappush(heap, new_node)
 
-int main() {
-    int n;
-    cout << "Enter number of characters: ";
-    cin >> n;
-
-    char ch;
-    int freq;
-    priority_queue<Node*, vector<Node*>, Compare> pq;
-
-    cout << "Enter characters and their frequencies:\n";
-    for (int i = 0; i < n; i++) {
-        cin >> ch >> freq;
-        pq.push(new Node(ch, freq));
-    }
-
-    // Build Huffman Tree
-    while (pq.size() > 1) {
-        Node* left = pq.top(); pq.pop();
-        Node* right = pq.top(); pq.pop();
-
-        Node* newNode = new Node('$', left->freq + right->freq);
-        newNode->left = left;
-        newNode->right = right;
-
-        pq.push(newNode);
-    }
-
-    Node* root = pq.top();
-
-    cout << "\nHuffman Codes are:\n";
-    printCodes(root, "");
-
-    return 0;
-}
+# Print Huffman Codes
+print("\nHuffman Codes for the given characters:")
+root = heap[0]
+print_codes(root)
